@@ -76,7 +76,7 @@ scale_fill_20 <- function(...){
 
 ```{r}
 # load the required table with telomere content calculations from TelomereHunter
-masterdataframe_tanno <- read_csv("masterdataframe_tanno_satpathy.csv")
+masterdataframe_tanno <- read_csv("../data/masterdataframe_tanno_satpathy.csv")
 masterdataframe_tanno$pre_post_f = factor(masterdataframe_tanno$pre_post, levels=c('pre treatment','post treatment'))
 
 # compute "raw telomere content" or telomeric reads per million sequenced reads (TRPM)
@@ -290,7 +290,7 @@ diff_data$tel_diff <- diff_data$`median(tel_content).y` - diff_data$`median(tel_
 diff_data$count_diff_percentage <- ((diff_data$count.y - diff_data$count.x) / diff_data$count.x) * 100
 
 # load the UMAP data
-harmony_umap <- readRDS("harmony_umap.rds")
+harmony_umap <- readRDS("../data/harmony_umap.rds")
 
 # merge the UMAP data with the masterdataframe 
 masterdataframe_tanno_t4_umap <- merge(masterdataframe_tanno_t4, harmony_umap, by = "barcode")
