@@ -29,6 +29,7 @@ library(tidyr)
 library(rstatix)
 library(reshape2)
 library(Seurat)
+library(scales)
 library(BiocompR)
 library(ggtext)
 library(umap)
@@ -39,20 +40,27 @@ library(RColorBrewer)
 options(scipen=1000000)
 
 # style templates
-theme_Publication <- 
+theme_publication <- 
   theme_bw() +
   theme(axis.line = element_line(color='black'),
         plot.background = element_blank(),
         panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank())
+        panel.grid.minor = element_blank(),
+        axis.text.x = element_text(vjust = 1, hjust=0.5, size = 15),  
+        axis.text.y = element_text(size = 15),
+        axis.title = element_text(size = 20),
+        strip.text.x = element_text(size = 15),
+        strip.text.y = element_text(size = 15),
+        legend.text = element_text(size = 15),
+        legend.title = element_text(size = 20))
 
-scale_fill_Publication <- function(...){
+scale_fill_publication <- function(...){
   library(scales)
   discrete_scale("fill","Publication",manual_pal(values = c("#386cb0","#fdb462","#7fc97f","#ef3b2c","#662506","#a6cee3","#fb9a99","#984ea3","#ffff33")), ...)
   
 }
 
-scale_colour_Publication <- function(...){
+scale_colour_publication <- function(...){
   library(scales)
   discrete_scale("colour","Publication",manual_pal(values = c("#386cb0","#fdb462","#7fc97f","#ef3b2c","#662506","#a6cee3","#fb9a99","#984ea3","#ffff33")), ...)
   
@@ -132,14 +140,7 @@ threshold_sums$Var1 <- 10^as.numeric(threshold_sums$Var1)
 A1 <- ggplot(masterdataframe_tanno, aes(total_reads)) +
   geom_histogram(bins = 100) +
   geom_vline(xintercept = 10000, color = "red") +
-  theme_Publication +
-  theme(axis.text.x = element_text(vjust = 1, hjust=0.5, size = 15),  
-        axis.text.y = element_text(size = 15),
-        axis.title = element_text(size = 20),
-        strip.text.x = element_text(size = 15),
-        strip.text.y = element_text(size = 15),
-        legend.text = element_text(size = 15),
-        legend.title = element_text(size = 20)) +
+  theme_publication +
   labs(x = "Total reads") +
   scale_x_log10(breaks = c(1000, 10000, 100000, 1000000)) +
   annotation_logticks(side = "b")
@@ -147,14 +148,7 @@ A1 <- ggplot(masterdataframe_tanno, aes(total_reads)) +
 B1 <- ggplot(threshold_sums, aes(factor(Var1), zeros*100, group = 1)) + 
   geom_line(size = 1) +
   geom_vline(xintercept = factor(10000), color = "red") +
-  theme_Publication +
-  theme(axis.text.x = element_text(vjust = 1, hjust=0.5, size = 15),  
-        axis.text.y = element_text(size = 15),
-        axis.title = element_text(size = 20),
-        strip.text.x = element_text(size = 15),
-        strip.text.y = element_text(size = 15),
-        legend.text = element_text(size = 15),
-        legend.title = element_text(size = 20)) +
+  theme_publication +
   scale_x_discrete(labels = c("", "1000", rep("", 9), "10000", rep("", 9), "100000", rep("", 5))) +
   labs(x = "Total reads cutoff", y = "Telomere content zero ratio [%]")
 
@@ -162,14 +156,7 @@ C1 <- ggplot(threshold_cell_subtype_stats, aes(factor(threshold), Median, col = 
   geom_line() +
   geom_vline(xintercept = factor(10000), color = "red") +
   scale_colour_20() +
-  theme_Publication +
-  theme(axis.text.x = element_text(vjust = 1, hjust=0.5, size = 15),  
-        axis.text.y = element_text(size = 15),
-        axis.title = element_text(size = 20),
-        strip.text.x = element_text(size = 15),
-        strip.text.y = element_text(size = 15),
-        legend.text = element_text(size = 15),
-        legend.title = element_text(size = 20)) +
+  theme_publication +
   labs(col = "T-cell subtype", y = "Median telomere content", x = "Total reads cutoff") +
   scale_x_discrete(labels = c("", "1000", rep("", 9), "10000", rep("", 9), "100000", rep("", 5))) +
   theme(legend.position = "none")
@@ -200,27 +187,15 @@ A2 <- ggplot(masterdataframe_tanno_t4, aes(cell_type, trpm)) +
   geom_hline(yintercept = 200, color = "red") +
   geom_hline(yintercept = 1000, color = "red") +
   scale_y_log10() +
-  theme_Publication +
-  theme(axis.text.x = element_text(angle = 60, vjust = 1, hjust= 1, size = 15),  
-        axis.text.y = element_text(size = 15),
-        strip.text.x = element_text(size = 15),
-        strip.text.y = element_text(size = 15),
-        axis.title = element_text(size = 20),
-        legend.text = element_text(size = 15),
-        legend.title = element_text(size = 20)) +
+  theme_publication +
+  theme(axis.text.x = element_text(angle = 60, vjust = 1, hjust= 1)) +
   labs(y = "Telomeric reads [TRPM]", x = "Cell type")
 
 B2 <- ggplot(masterdataframe_tanno_t4, aes(sampleID, trpm, fill = responder)) +
   geom_boxplot() +
-  theme_Publication +
+  theme_publication +
   scale_fill_manual(values = c("#4393C3", "#D6604D")) +
-  theme(axis.text.x = element_text(angle = 60, vjust = 1, hjust= 1, size = 15),  
-        axis.text.y = element_text(size = 15),
-        strip.text.x = element_text(size = 15),
-        strip.text.y = element_text(size = 15),
-        axis.title = element_text(size = 20),
-        legend.text = element_text(size = 15),
-        legend.title = element_text(size = 20),
+  theme(axis.text.x = element_text(angle = 60, vjust = 1, hjust= 1), 
         legend.position = "none") +
   scale_y_log10() +
   geom_hline(yintercept = 200, color = "red") +
@@ -229,14 +204,8 @@ B2 <- ggplot(masterdataframe_tanno_t4, aes(sampleID, trpm, fill = responder)) +
 
 C2 <- ggplot(masterdataframe_tanno_t4, aes(Satpathy_T_cell_annot, trpm)) +
   geom_boxplot() +
-  theme_Publication +
-  theme(axis.text.x = element_text(angle = 60, vjust = 1, hjust= 1, size = 15),  
-        axis.text.y = element_text(size = 15),
-        axis.title = element_text(size = 20),
-        strip.text.x = element_text(size = 15),
-        strip.text.y = element_text(size = 15),
-        legend.text = element_text(size = 15),
-        legend.title = element_text(size = 20)) +
+  theme_publication +
+  theme(axis.text.x = element_text(angle = 60, vjust = 1, hjust= 1)) +
   scale_y_log10() +
   geom_hline(yintercept = 200, color = "red") +
   geom_hline(yintercept = 1000, color = "red") +
@@ -320,14 +289,8 @@ A3 <- masterdataframe_tanno_t4_umap_rounded_stats %>%
   facet_grid(pre_post_f~responder) +
   scale_color_viridis(option = "plasma", limits = c(0, 25000), oob = scales::squish) +
   labs(col = "Mean telomere content") +
-  theme_Publication +
-  theme(axis.title = element_text(size = 20),
-        legend.text = element_text(size = 15),
-        legend.title = element_text(size = 20),
-        text=element_text(size=15),
-        strip.text.x = element_text(size = 15),
-        strip.text.y = element_text(size = 15),
-        plot.background = element_blank(),
+  theme_publication +
+  theme(plot.background = element_blank(),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         strip.background =element_rect(fill="white"),
@@ -346,17 +309,11 @@ B3 <- masterdataframe_tanno_t4_umap %>%
   facet_grid(pre_post_f~responder) +
   scale_colour_20() +
   labs(col = "T-cell subtype") +
-  theme_Publication +
-  theme(axis.title = element_text(size = 20),
-        legend.text = element_text(size = 15),
-        legend.title = element_text(size = 20),
-        text=element_text(size=15),
-        plot.background = element_blank(),
+  theme_publication +
+  theme(plot.background = element_blank(),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         strip.background =element_rect(fill="white"),
-        strip.text.x = element_text(size = 15),
-        strip.text.y = element_text(size = 15),
         axis.title.x = element_blank(),
         axis.title.y = element_blank(),
         axis.text.x = element_blank(),
@@ -372,16 +329,10 @@ C3 <- ggplot(subset(diff_data, patientID == "SU009"), aes(tel_diff, count_diff_p
   scale_y_continuous(limits = symmetric_limits) +
   geom_vline(xintercept = 0, color = "grey") + geom_hline(yintercept = 0, color = "grey") +
   labs(subtitle = "SU009", x = "Median telomere content difference (post - pre)", y = "Cell count difference (post - pre) [%]", col = "T-cell subtype") +
-  theme_Publication +
-  theme(text=element_text(size=15)) +
+  theme_publication +
   scale_colour_20() +
-  theme(axis.text.x = element_text(vjust = 1, hjust=1, size = 15),  
-        axis.text.y = element_text(size = 15),
-        axis.title = element_text(size = 20),
-        strip.text.x = element_text(size = 15),
-        strip.text.y = element_text(size = 15),
-        legend.text = element_text(size = 15),
-        legend.title = element_text(size = 20))
+  theme(text=element_text(size=15), 
+        axis.text.x = element_text(vjust = 1, hjust=1))
 
 # generate the multipanel figure 
 FIG3 = plot_grid(
@@ -476,15 +427,9 @@ bottom_quartile_stats_data_wilcox <- merge(bottom_quartile_stats, pre_post_wilco
 A4 <- ggplot(masterdataframe_tanno_t4, aes(responder, tel_content, fill = responder)) +
   geom_boxplot(outlier.shape = NA) +
   scale_fill_manual(values = c("#4393C3", "#D6604D")) +  
-  theme_Publication +
+  theme_publication +
   theme(text=element_text(size=15), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1), 
         legend.position = "none") +
-  theme(axis.text.x = element_text(vjust = 1, hjust=1, size = 15),  
-        axis.text.y = element_text(size = 15),
-        axis.title = element_text(size = 20),
-        strip.text.x = element_text(size = 15),
-        legend.text = element_text(size = 15),
-        legend.title = element_text(size = 20)) +
   facet_grid(pre_post_f ~ cell_type) +
   coord_cartesian(ylim = c(0, 15000)) +
   labs(y = "Telomere content", x = "Response", fill = "Response") +
@@ -497,16 +442,9 @@ B4 <- ggplot(masterdataframe_tanno_t4, aes(patientID, tel_content, fill = respon
   stat_summary(fun.data = give.n, geom = "text", fun = sum, size = 5) +
   facet_wrap(~factor(pre_post, levels = c("pre treatment", "post treatment"))) +
   scale_fill_manual(values = c("#4393C3", "#D6604D")) +
-  theme_Publication +
+  theme_publication +
   theme(text=element_text(size=15), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1), 
         legend.position = "none") + 
-  theme(axis.text.x = element_text(vjust = 1, hjust=1, size = 15),  
-        axis.text.y = element_text(size = 15),
-        axis.title = element_text(size = 20),
-        strip.text.x = element_text(size = 15),
-        strip.text.y = element_text(size = 15),
-        legend.text = element_text(size = 15),
-        legend.title = element_text(size = 20)) +
   labs(y = "Telomere content", fill = "Response")
 
 # set the significant threshold to color dots based on q-value
@@ -524,14 +462,9 @@ C4 <- ggplot(pre_post_wilcox_test, aes(x = pre_post_effsize_wilcox.effsize, y = 
   ) +
   facet_wrap(~pre_post_f) +
   labs(subtitle = "all cells", x = "Wilcoxon effect size", y = "-log10 p-value") +
-  theme_Publication +
-  theme(text=element_text(size=15)) +
-  theme(axis.text.x = element_text(vjust = 1, hjust=1, size = 15),  
-        axis.text.y = element_text(size = 15),
-        axis.title = element_text(size = 20),
-        strip.text.x = element_text(size = 15),
-        legend.text = element_text(size = 15),
-        legend.title = element_text(size = 20))
+  theme_publication +
+  theme(text=element_text(size=15),
+        axis.text.x = element_text(vjust = 1, hjust=1))
 
 D4 <- bottom_quartile_test_data %>%
   ggplot(aes(x = effsize, y = -log10(p))) +
@@ -546,28 +479,17 @@ D4 <- bottom_quartile_test_data %>%
   ) +
   facet_wrap(~pre_post_f) +
   labs(subtitle = "bottom quartile", x = "Wilcoxon effect size", y = "-log10 p-value") +
-  theme_Publication +
-  theme(text=element_text(size=15)) +
-  theme(axis.text.x = element_text(vjust = 1, hjust=1, size = 15),  
-        axis.text.y = element_text(size = 15),
-        strip.text.x = element_text(size = 15),
-        strip.text.y = element_text(size = 15),
-        axis.title = element_text(size = 20),
-        legend.text = element_text(size = 15),
-        legend.title = element_text(size = 20))
+  theme_publication +
+  theme(text=element_text(size=15), 
+        axis.text.x = element_text(vjust = 1, hjust=1))
 
 E4 <- pre_post_wilcox_test_full %>%
   ggplot(aes(no, median, col = Satpathy_T_cell_annot, shape = responder, size = -log10(p.adj))) +
   geom_point() +
   facet_wrap(~pre_post_f) +
-  theme_Publication +
-  theme(text=element_text(size=15)) +
-  theme(axis.text.x = element_text(vjust = 1, hjust=1, size = 15),  
-        axis.text.y = element_text(size = 15),
-        axis.title = element_text(size = 20),
-        strip.text.x = element_text(size = 15),
-        legend.text = element_text(size = 15),
-        legend.title = element_text(size = 20)) +
+  theme_publication +
+  theme(text=element_text(size=15), 
+        axis.text.x = element_text(vjust = 1, hjust=1)) +
   labs(subtitle = "all cells", x = "No. of cells", y = "Median telomere content", col = "T-cell subtype", shape = "Response") +
   scale_colour_20()
 
@@ -575,15 +497,11 @@ F4 <- bottom_quartile_stats_data_wilcox %>%
   ggplot(aes(no, median, col = Satpathy_T_cell_annot, shape = responder, size = -log10(p.adj))) +
   geom_point() +
   facet_wrap(~pre_post_f) +
-  theme_Publication +
-  theme(text=element_text(size=15)) +
-  theme(legend.position = "bottom", legend.box = "vertical") +
-  theme(axis.text.x = element_text(vjust = 1, hjust=1, size = 15),  
-        axis.text.y = element_text(size = 15),
-        strip.text.x = element_text(size = 15),
-        axis.title = element_text(size = 20),
-        legend.text = element_text(size = 15),
-        legend.title = element_text(size = 20)) +
+  theme_publication +
+  theme(text=element_text(size=15), 
+        legend.position = "bottom", 
+        legend.box = "vertical", 
+        axis.text.x = element_text(vjust = 1, hjust=1)) +
   labs(subtitle = "bottom quartile", x = "No. of cells", y = paste0("Bottom ", lower_quantile_cutoff, " quantile median telomere content"), col = "T-cell subtype", shape = "Response") +
   scale_colour_20()
 
@@ -669,48 +587,30 @@ pre_post_wilcox_test %>%
 ```{r}
 SA1 = ggplot(threshold_sums, aes(factor(Var1), percentage*100, group = 1)) +
   geom_line() +
-  theme_Publication +
+  theme_publication +
   geom_vline(xintercept = factor(10000), color = "red") +
   labs(x = "Total reads cutoff to the power of 10", y = "Total cell ratio [%]") +
   scale_x_discrete(breaks = c(1000, 10000, 100000)) +
-  theme(text=element_text(size=15)) +
-  theme(axis.text.x = element_text(vjust = 1, hjust=1, size = 15),  
-        axis.text.y = element_text(size = 15),
-        strip.text.x = element_text(size = 15),
-        strip.text.y = element_text(size = 15),
-        axis.title = element_text(size = 20),
-        legend.text = element_text(size = 15),
-        legend.title = element_text(size = 20))
+  theme(text=element_text(size=15), 
+        axis.text.x = element_text(vjust = 1, hjust=1))
 
 SB1 = ggplot(threshold_sums, aes(factor(Var1), sd, group = 1)) + 
   geom_line() +
-  theme_Publication +
+  theme_publication +
   geom_vline(xintercept = factor(10000), color = "red") +
   labs(x = "Total reads cutoff to the power of 10", y = "Telomere content standard deviation") +
   scale_x_discrete(breaks = c(1000, 10000, 100000)) +
-  theme(text=element_text(size=15)) +
-  theme(axis.text.x = element_text(vjust = 1, hjust=1, size = 15),  
-        axis.text.y = element_text(size = 15),
-        strip.text.x = element_text(size = 15),
-        strip.text.y = element_text(size = 15),
-        axis.title = element_text(size = 20),
-        legend.text = element_text(size = 15),
-        legend.title = element_text(size = 20))
+  theme(text=element_text(size=15), 
+        axis.text.x = element_text(vjust = 1, hjust=1))
 
 SC1 = ggplot(threshold_sums, aes(factor(Var1), median, group = 1)) + 
   geom_line() +
-  theme_Publication +
+  theme_publication +
   geom_vline(xintercept = factor(10000), color = "red") +
   labs(x = "Total reads cutoff to the power of 10", y = "Telomere content median") +
   scale_x_discrete(breaks = c(1000, 10000, 100000)) +
-  theme(text=element_text(size=15)) +
-  theme(axis.text.x = element_text(vjust = 1, hjust=1, size = 15),  
-        axis.text.y = element_text(size = 15),
-        strip.text.x = element_text(size = 15),
-        strip.text.y = element_text(size = 15),
-        axis.title = element_text(size = 20),
-        legend.text = element_text(size = 15),
-        legend.title = element_text(size = 20))
+  theme(text=element_text(size=15), 
+        axis.text.x = element_text(vjust = 1, hjust=1))
 
 # generate the multipanel figure 
 SFIG1 <- plot_grid(SA1, SB1, SC1, 
@@ -752,57 +652,29 @@ threshold_patient_stats$threshold <- 10^as.numeric(threshold_patient_stats$thres
 
 SA2 <- ggplot(threshold_response_stats, aes(factor(threshold), Median, col = factor(responder), group = responder)) +
   geom_line() +
-  theme_Publication +
+  theme_publication +
   scale_colour_manual(values = c("#4393C3", "#D6604D")) +
-  theme(axis.text.x = element_text(vjust = 1, hjust=0.5, size = 15),  
-        axis.text.y = element_text(size = 15),
-        axis.title = element_text(size = 20),
-        strip.text.x = element_text(size = 15),
-        strip.text.y = element_text(size = 15),
-        legend.text = element_text(size = 15),
-        legend.title = element_text(size = 20)) +
   labs(col = "Response", y = "Median telomere content", x = "") +
   scale_x_discrete(labels = c("", "1000", rep("", 9), "10000", rep("", 9), "100000", rep("", 5)))
 
 SB2 <- ggplot(threshold_time_stats, aes(factor(threshold), Median, col = factor(pre_post), group = pre_post)) +
   geom_line() +
-  theme_Publication +
-  scale_colour_Publication() +
-  theme(axis.text.x = element_text(vjust = 1, hjust=0.5, size = 15),  
-        axis.text.y = element_text(size = 15),
-        axis.title = element_text(size = 20),
-        strip.text.x = element_text(size = 15),
-        strip.text.y = element_text(size = 15),
-        legend.text = element_text(size = 15),
-        legend.title = element_text(size = 20)) +
+  theme_publication +
+  scale_colour_publication() +
   labs(col = "Time", y = "", x = "") +
   scale_x_discrete(labels = c("", "1000", rep("", 9), "10000", rep("", 9), "100000", rep("", 5)))
 
 SC2 <- ggplot(threshold_cell_type_stats, aes(factor(threshold), Median, col = factor(cell_type), group = cell_type)) +
   geom_line() +
-  theme_Publication +
-  scale_colour_Publication() +
-  theme(axis.text.x = element_text(vjust = 1, hjust=0.5, size = 15),  
-        axis.text.y = element_text(size = 15),
-        axis.title = element_text(size = 20),
-        strip.text.x = element_text(size = 15),
-        strip.text.y = element_text(size = 15),
-        legend.text = element_text(size = 15),
-        legend.title = element_text(size = 20)) +
+  theme_publication +
+  scale_colour_publication() +
   labs(col = "Cell type", y = "Median telomere content", x = "Total reads cutoff") +
   scale_x_discrete(labels = c("", "1000", rep("", 9), "10000", rep("", 9), "100000", rep("", 5)))
 
 SD2 <- ggplot(threshold_patient_stats, aes(factor(threshold), Median, col = factor(patientID), group = patientID)) +
   geom_line() +
-  theme_Publication +
-  scale_colour_Publication() +
-  theme(axis.text.x = element_text(vjust = 1, hjust=0.5, size = 15),  
-        axis.text.y = element_text(size = 15),
-        axis.title = element_text(size = 20),
-        strip.text.x = element_text(size = 15),
-        strip.text.y = element_text(size = 15),
-        legend.text = element_text(size = 15),
-        legend.title = element_text(size = 20)) +
+  theme_publication +
+  scale_colour_publication() +
   labs(col = "PatientID", y = "", x = "Total reads cutoff") +
   scale_x_discrete(labels = c("", "1000", rep("", 9), "10000", rep("", 9), "100000", rep("", 5)))
 
@@ -822,71 +694,36 @@ ggsave(filename = "path/suppl_figure_2.png", plot = SFIG2, units = "in", width =
 ```{r}
 SA3 <- ggplot(threshold_response_stats, aes(factor(threshold), SD, col = factor(responder), group = responder)) +
   geom_line() +
-  theme_Publication +
+  theme_publication +
   scale_colour_manual(values = c("#4393C3", "#D6604D")) +
-  theme(axis.text.x = element_text(vjust = 1, hjust=0.5, size = 15),  
-        axis.text.y = element_text(size = 15),
-        axis.title = element_text(size = 20),
-        strip.text.x = element_text(size = 15),
-        strip.text.y = element_text(size = 15),
-        legend.text = element_text(size = 15),
-        legend.title = element_text(size = 20)) +
   labs(col = "Response", y = "Standard deviation telomere content", x = "") +
   scale_x_discrete(labels = c("", "1000", rep("", 9), "10000", rep("", 9), "100000", rep("", 5)))
 
 SB3 <- ggplot(threshold_time_stats, aes(factor(threshold), SD, col = factor(pre_post), group = pre_post)) +
   geom_line() +
-  theme_Publication +
-  scale_colour_Publication() +
-  theme(axis.text.x = element_text(vjust = 1, hjust=0.5, size = 15),  
-        axis.text.y = element_text(size = 15),
-        axis.title = element_text(size = 20),
-        strip.text.x = element_text(size = 15),
-        strip.text.y = element_text(size = 15),
-        legend.text = element_text(size = 15),
-        legend.title = element_text(size = 20)) +
+  theme_publication +
+  scale_colour_publication() +
   labs(col = "Time", y = "", x = "") +
   scale_x_discrete(labels = c("", "1000", rep("", 9), "10000", rep("", 9), "100000", rep("", 5)))
 
 SC3 <- ggplot(threshold_cell_type_stats, aes(factor(threshold), SD, col = factor(cell_type), group = cell_type)) +
   geom_line() +
-  theme_Publication +
-  scale_colour_Publication() +
-  theme(axis.text.x = element_text(vjust = 1, hjust=0.5, size = 15),  
-        axis.text.y = element_text(size = 15),
-        axis.title = element_text(size = 20),
-        strip.text.x = element_text(size = 15),
-        strip.text.y = element_text(size = 15),
-        legend.text = element_text(size = 15),
-        legend.title = element_text(size = 20)) +
+  theme_publication +
+  scale_colour_publication() +
   labs(col = "Cell type", y = "Standard deviation telomere content", x = "Total reads cutoff") +
   scale_x_discrete(labels = c("", "1000", rep("", 9), "10000", rep("", 9), "100000", rep("", 5)))
 
 SD3 <- ggplot(threshold_patient_stats, aes(factor(threshold), SD, col = factor(patientID), group = patientID)) +
   geom_line() +
-  theme_Publication +
-  scale_colour_Publication() +
-  theme(axis.text.x = element_text(vjust = 1, hjust=0.5, size = 15),  
-        axis.text.y = element_text(size = 15),
-        axis.title = element_text(size = 20),
-        strip.text.x = element_text(size = 15),
-        strip.text.y = element_text(size = 15),
-        legend.text = element_text(size = 15),
-        legend.title = element_text(size = 20)) +
+  theme_publication +
+  scale_colour_publication() +
   labs(col = "PatientID", y = "", x = "Total reads cutoff") +
   scale_x_discrete(labels = c("", "1000", rep("", 9), "10000", rep("", 9), "100000", rep("", 5)))
 
 SE3 <- ggplot(threshold_cell_subtype_stats, aes(factor(threshold), SD, col = factor(Satpathy_T_cell_annot), group = Satpathy_T_cell_annot)) +
   geom_line() +
-  theme_Publication +
+  theme_publication +
   scale_colour_20() +
-  theme(axis.text.x = element_text(vjust = 1, hjust=0.5, size = 15),  
-        axis.text.y = element_text(size = 15),
-        axis.title = element_text(size = 20),
-        strip.text.x = element_text(size = 15),
-        strip.text.y = element_text(size = 15),
-        legend.text = element_text(size = 15),
-        legend.title = element_text(size = 20)) +
   labs(col = "T-cell subtype", y = "Standard deviation telomere content", x = "Total reads cutoff") +
   scale_x_discrete(labels = c("", "1000", rep("", 9), "10000", rep("", 9), "100000", rep("", 5)))
 
@@ -911,18 +748,11 @@ SFIG4 <- masterdataframe_tanno_t4 %>%
   ggplot(aes(patientID, tel_content, fill = patientID %in% c("SU001", "SU009"))) +
   geom_violin() +
   geom_boxplot(width = .25, outlier.shape = NA) +
-  theme_classic() +
+  theme_publication +
   scale_y_log10() +
   scale_fill_manual(labels = c("Non-responder", "Responder"), values = c("#4393C3", "#D6604D")) +
   labs(x = "PatientID", y = "Telomere content", fill = "Response") +
-  annotation_logticks(side = "l") +
-    theme(axis.text.x = element_text(vjust = 1, hjust=0.5, size = 15),  
-        axis.text.y = element_text(size = 15),
-        axis.title = element_text(size = 20),
-        strip.text.x = element_text(size = 15),
-        strip.text.y = element_text(size = 15),
-        legend.text = element_text(size = 15),
-        legend.title = element_text(size = 20))
+  annotation_logticks(side = "l")
 
 # save the figure
 ggsave(filename = "path/suppl_figure_4.pdf", plot = SFIG4, units = "in", width = 8, height = 8)
@@ -952,17 +782,10 @@ SA5 = ggplot(ctrpm_df, aes(cell_type, trpm, fill = factor(t, labels = c("no thre
   geom_col(position = "dodge") +
   scale_fill_manual(values = c("dodgerblue", "darkorange")) +
   labs(x = "Cell type", y = "Cells in *in vivo* validated range [%]", fill = "Threshold") +
-  theme_classic() +
-  theme(axis.text.x = element_text(angle = 60, vjust = 1, hjust=1, size = 14), 
-        axis.title.y = ggtext::element_markdown()) +
-  theme(legend.position="none") +
-      theme(axis.text.x = element_text(vjust = 1, hjust=1, size = 15),  
-        axis.text.y = element_text(size = 15),
-        axis.title = element_text(size = 20),
-        strip.text.x = element_text(size = 15),
-        strip.text.y = element_text(size = 15),
-        legend.text = element_text(size = 15),
-        legend.title = element_text(size = 20))
+  theme_publication +
+  theme(axis.text.x = element_text(angle = 60, vjust = 1, hjust=1), 
+        axis.title.y = ggtext::element_markdown(), 
+        legend.position="none")
 
 
 ctrpm <- masterdataframe_tanno %>%
@@ -984,18 +807,10 @@ SB5 = ggplot(ctrpm_df, aes(sampleID, trpm, fill = factor(t, labels = c("no thres
   geom_col(position = "dodge") +
   scale_fill_manual(values = c("dodgerblue", "darkorange")) +
   labs(x = "SampleID", y = "", fill = "Threshold") +
-  theme_classic() +
-  theme(axis.text.x = element_text(angle = 60, vjust = 1, hjust=1, size = 14), 
-        axis.title.y = ggtext::element_markdown()) +
-  theme(legend.position="none") +
-      theme(axis.text.x = element_text(vjust = 1, hjust=1, size = 15),  
-        axis.text.y = element_text(size = 15),
-        axis.title = element_text(size = 20),
-        strip.text.x = element_text(size = 15),
-        strip.text.y = element_text(size = 15),
-        legend.text = element_text(size = 15),
-        legend.title = element_text(size = 20))
-
+  theme_publication +
+  theme(axis.text.x = element_text(angle = 60, vjust = 1, hjust=1), 
+        axis.title.y = ggtext::element_markdown(), 
+        legend.position="none")
 
 ctrpm <- masterdataframe_tanno %>%
   group_by(Satpathy_T_cell_annot) %>%
@@ -1016,16 +831,9 @@ SC5 = ggplot(ctrpm_df, aes(Satpathy_T_cell_annot, trpm, fill = factor(t, labels 
   geom_col(position = "dodge") +
   scale_fill_manual(values = c("dodgerblue", "darkorange")) +
   labs(x = "T-cell subtype", y = "", fill = "Threshold") +
-  theme_classic() +
-  theme(axis.text.x = element_text(angle = 60, vjust = 1, hjust=1, size = 14), 
-        axis.title.y = ggtext::element_markdown()) +
-      theme(axis.text.x = element_text(vjust = 1, hjust=1, size = 15),  
-        axis.text.y = element_text(size = 15),
-        axis.title = element_text(size = 20),
-        strip.text.x = element_text(size = 15),
-        strip.text.y = element_text(size = 15),
-        legend.text = element_text(size = 15),
-        legend.title = element_text(size = 20))
+  theme_publication +
+  theme(axis.text.x = element_text(angle = 60, vjust = 1, hjust=1), 
+        axis.title.y = ggtext::element_markdown())
 
 # generate the multipanel figure 
 SFIG5 <- plot_grid(SA5, SB5, SC5,
@@ -1046,14 +854,9 @@ SA6 <- masterdataframe_tanno_t4_umap_rounded_stats %>%
   facet_grid(pre_post_f~responder) +
   scale_color_viridis(option = "plasma", limits = c(0, 25000), oob = scales::squish) +
   labs(subtitle = "Median telomere content per averaged UMAP coordinate", col = "Telomere content") +
-  theme_Publication +
+  theme_publication +
   theme(legend.position = "none",
-        axis.title = element_text(size = 20),
-        legend.text = element_text(size = 15),
-        legend.title = element_text(size = 20),
         text=element_text(size=15),
-        strip.text.x = element_text(size = 15),
-        strip.text.y = element_text(size = 15),
         plot.background = element_blank(),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
@@ -1073,14 +876,9 @@ SB6 <- masterdataframe_tanno_t4_umap_rounded_stats %>%
   facet_grid(pre_post_f~responder) +
   scale_color_viridis(option = "plasma", limits = c(0, 25000), oob = scales::squish) +
   labs(subtitle = "Maximum telomere content per averaged UMAP coordinate", col = "Telomere content") +
-  theme_Publication +
+  theme_publication +
   theme(legend.position = "bottom",
-        axis.title = element_text(size = 20),
-        legend.text = element_text(size = 15),
-        legend.title = element_text(size = 20),
         text=element_text(size=15),
-        strip.text.x = element_text(size = 15),
-        strip.text.y = element_text(size = 15),
         plot.background = element_blank(),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
@@ -1106,14 +904,9 @@ SC6 <- masterdataframe_tanno_t4_umap_rounded_stats %>%
   facet_grid(pre_post_f~responder) +
   scale_color_viridis(option = "plasma", limits = c(0, 25000), oob = scales::squish) +
   labs(subtitle = "Minimum telomere content per averaged UMAP coordinate", col = "Telomere content") +
-  theme_Publication +
+  theme_publication +
   theme(legend.position = "bottom",
-        axis.title = element_text(size = 20),
-        legend.text = element_text(size = 15),
-        legend.title = element_text(size = 20),
         text=element_text(size=15),
-        strip.text.x = element_text(size = 15),
-        strip.text.y = element_text(size = 15),
         plot.background = element_blank(),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
@@ -1173,15 +966,9 @@ SA7 = ggplot(subset(diff_data, Satpathy_T_cell_annot != "No T cell"), aes(patien
   scale_fill_manual(labels = c("Non-responder", "Responder"), values = c("#4393C3", "#D6604D")) +
   geom_hline(yintercept = 0, color = "grey") +
   labs(x = "PatientID", y = "Normalized cell count difference (post - pre)", fill = "Response") +
-  theme_Publication +
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1), text=element_text(size=15)) +
-        theme(axis.text.x = element_text(vjust = 1, hjust=1, size = 15),  
-        axis.text.y = element_text(size = 15),
-        axis.title = element_text(size = 20),
-        strip.text.x = element_text(size = 15),
-        strip.text.y = element_text(size = 15),
-        legend.text = element_text(size = 15),
-        legend.title = element_text(size = 20))
+  theme_publication +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1), 
+        text=element_text(size=15))
 
 SB7 = ggplot(subset(diff_data, Satpathy_T_cell_annot != "No T cell"), aes(tel_diff, count_diff_normalized, col = patientID %in% c("SU001", "SU009"), shape = patientID)) +
   geom_point() +
@@ -1192,15 +979,9 @@ SB7 = ggplot(subset(diff_data, Satpathy_T_cell_annot != "No T cell"), aes(tel_di
   scale_shape_manual(values=c(1,2,3,4,6,7,8)) +
   geom_vline(xintercept = 0, color = "grey") + geom_hline(yintercept = 0, color = "grey") +
   labs(x = "Median telomere content difference (post - pre)", y = "Normalized cell count difference (post - pre)", col = "Response", shape = "PatientID") +
-  theme_Publication +
-  theme(text=element_text(size=15)) +
-        theme(axis.text.x = element_text(vjust = 1, hjust=1, size = 15),  
-        axis.text.y = element_text(size = 15),
-        axis.title = element_text(size = 20),
-        strip.text.x = element_text(size = 15),
-        strip.text.y = element_text(size = 15),
-        legend.text = element_text(size = 15),
-        legend.title = element_text(size = 20))
+  theme_publication +
+  theme(text=element_text(size=15),
+        axis.text.x = element_text(vjust = 1, hjust=1))
 
 # generate the multipanel figure 
 SFIG7 <- plot_grid(
@@ -1224,16 +1005,10 @@ SFIG8 <- ggplot(subset(diff_data, patientID %in% c("SU001", "SU006", "SU008", "S
   geom_vline(xintercept = 0, color = "grey") + geom_hline(yintercept = 0, color = "grey") +
   labs(x = "Median telomere content difference (post - pre)", y = "Cell count difference (post - pre) [%]", col = "T-cell subtype") +
   facet_wrap(~patientID, scales = "free") +
-  theme_Publication +
-  theme(text=element_text(size=15)) +
-  scale_colour_20() +
-  theme(axis.text.x = element_text(vjust = 1, hjust=1, size = 15),  
-        axis.text.y = element_text(size = 15),
-        axis.title = element_text(size = 20),
-        strip.text.x = element_text(size = 15),
-        strip.text.y = element_text(size = 15),
-        legend.text = element_text(size = 15),
-        legend.title = element_text(size = 20))
+  theme_publication +
+  theme(text=element_text(size=15), 
+        axis.text.x = element_text(vjust = 1, hjust=1)) +
+  scale_colour_20()
 
 # save the figure
 ggsave(filename = "path/suppl_figure_8.pdf", plot = SFIG8, units = "in", width = 16, height = 10)
@@ -1251,16 +1026,10 @@ SFIG9 <- ggplot(masterdataframe_tanno_t4, aes(patientID, tel_content, fill = res
   facet_wrap(~factor(pre_post, levels = c("pre treatment", "post treatment"))) +
   scale_fill_manual(values = c("#4393C3", "#D6604D")) +
   scale_y_log10() +
-  theme_Publication +
-  theme(text=element_text(size=15), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1), 
-        legend.position = "none") + 
-  theme(axis.text.x = element_text(vjust = 1, hjust=1, size = 15),  
-        axis.text.y = element_text(size = 15),
-        axis.title = element_text(size = 20),
-        strip.text.x = element_text(size = 15),
-        strip.text.y = element_text(size = 15),
-        legend.text = element_text(size = 15),
-        legend.title = element_text(size = 20)) +
+  theme_publication +
+  theme(text=element_text(size=15), 
+        axis.text.x = element_text(angle = 45, vjust = 1, hjust=1), 
+        legend.position = "none") +
   labs(x = "PatientID", y = "Telomere content", fill = "Response")
 
 # save the figure
@@ -1282,14 +1051,8 @@ SA10 <- ggplot(satpathy_celltype_wilcoxon_effsize) +
   geom_text(aes(x = group2, y = group1, label = round(p.adj, 2)), color = "black", vjust = 2.5, size = 3) +
   labs(x = "Cell type 1", y = "Cell type 2", fill = "q-value", size = "Effect size") +
   scale_fill_gradient(low = "white", high = "#386cb0", na.value = "black") +
-  theme_Publication +
-    theme(axis.text.x = element_text(vjust = 1, hjust=1, size = 15),  
-        axis.text.y = element_text(size = 15),
-        axis.title = element_text(size = 20),
-        strip.text.x = element_text(size = 15),
-        strip.text.y = element_text(size = 15),
-        legend.text = element_text(size = 15),
-        legend.title = element_text(size = 20))
+  theme_publication +
+    theme(axis.text.x = element_text(vjust = 1, hjust=1))
 
 satpathy_subtype_effsize <- wilcox_effsize(masterdataframe_tanno_t4, tel_content ~ Satpathy_T_cell_annot, paired = FALSE)
 satpathy_subtype_wilcoxon <- pairwise_wilcox_test(masterdataframe_tanno_t4, tel_content ~ Satpathy_T_cell_annot, p.adjust.method = "hochberg", paired = FALSE)
@@ -1301,15 +1064,8 @@ SB10 <- ggplot(satpathy_subtype_wilcoxon_effsize) +
   geom_text(aes(x = group2, y = group1, label = round(p.adj, 2)), color = "black", vjust = 2, size = 3) +
   labs(x = "T-cell subtype 1", y = "T-cell subtype 2", fill = "q-value", size = "Effect size") +
   scale_fill_gradient(low = "white", high = "#386cb0", na.value = "black") +
-  theme_Publication +
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) +
-  theme(axis.text.x = element_text(vjust = 1, hjust=1, size = 15),  
-        axis.text.y = element_text(size = 15),
-        axis.title = element_text(size = 20),
-        strip.text.x = element_text(size = 15),
-        strip.text.y = element_text(size = 15),
-        legend.text = element_text(size = 15),
-        legend.title = element_text(size = 20))
+  theme_publication +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 
 satpathy_patient_effsize <- wilcox_effsize(masterdataframe_tanno_t4, tel_content ~ patientID, paired = FALSE)
 satpathy_patient_wilcoxon <- pairwise_wilcox_test(masterdataframe_tanno_t4, tel_content ~ patientID, p.adjust.method = "hochberg", paired = FALSE)
@@ -1321,14 +1077,8 @@ SC10 <- ggplot(satpathy_patient_wilcoxon_effsize) +
   geom_text(aes(x = group2, y = group1, label = round(p.adj, 2)), color = "black", vjust = 2.5, size = 3) +
   labs(x = "PatientID 1", y = "PatientID 2", fill = "q-value", size = "Effect size") +
   scale_fill_gradient(low = "white", high = "#386cb0", na.value = "black") +
-  theme_Publication +
-    theme(axis.text.x = element_text(vjust = 1, hjust=1, size = 15),  
-        axis.text.y = element_text(size = 15),
-        axis.title = element_text(size = 20),
-        strip.text.x = element_text(size = 15),
-        strip.text.y = element_text(size = 15),
-        legend.text = element_text(size = 15),
-        legend.title = element_text(size = 20))
+  theme_publication +
+    theme(axis.text.x = element_text(vjust = 1, hjust=1))
 
 # generate the multipanel figure 
 SFIG10 <- plot_grid(
@@ -1370,37 +1120,25 @@ craviola_data_pre$Samples <- NULL
 SA11 <- ggcraviola(data = subset(craviola_data_pre, Seq_depth >= 4), 
                                lines.col = "black", 
                                mean.value = FALSE) +
-  theme_Publication +
+  theme_publication +
   scale_fill_manual(labels = c("Non-responder", "Responder"), values = c("#4393C3", "#D6604D")) +
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) +
   labs(x = "T-cell subtype", 
        y = "Telomere content", 
        fill = "Response") +
-    theme(axis.text.x = element_text(vjust = 1, hjust=1, size = 15),  
-        axis.text.y = element_text(size = 15),
-        axis.title = element_text(size = 20),
-        strip.text.x = element_text(size = 15),
-        strip.text.y = element_text(size = 15),
-        legend.text = element_text(size = 15),
-        legend.title = element_text(size = 20))
+    theme(axis.text.x = element_text(vjust = 1, hjust=1))
 
 craviola_data_post$Samples <- NULL
 SB11 <- ggcraviola(data = subset(craviola_data_post, Seq_depth >= 4), 
                                 lines.col = "black", 
                                 mean.value = FALSE) +
-  theme_Publication +
+  theme_publication +
   scale_fill_manual(labels = c("Non-responder", "Responder"), values = c("#4393C3", "#D6604D")) +
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) +
   labs(x = "T cell subtype", 
        y = "Telomere content", 
        fill = "Response") +
-    theme(axis.text.x = element_text(vjust = 1, hjust=1, size = 15),  
-        axis.text.y = element_text(size = 15),
-        axis.title = element_text(size = 20),
-        strip.text.x = element_text(size = 15),
-        strip.text.y = element_text(size = 15),
-        legend.text = element_text(size = 15),
-        legend.title = element_text(size = 20))
+    theme(axis.text.x = element_text(vjust = 1, hjust=1, size = 15))
 
 # generate the multipanel figure 
 SFIG11 <- plot_grid(
@@ -1423,7 +1161,7 @@ SA12 <- ggplot(subset(merged_data, pre_post == "pre treatment"), aes(patientID, 
   coord_cartesian(ylim = c(0, 10000)) +
   facet_wrap(~Satpathy_T_cell_annot) +
   labs(x = "PatientID", y = "Telomere content", fill = "Reponse") +
-  theme_Publication +
+  theme_publication +
   scale_fill_manual(labels = c("Non-responder", "Responder"), values = c("#4393C3", "#D6604D")) +
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) +
   geom_text(data = merged_data %>% dplyr::filter(pre_post == "pre treatment") %>% group_by(patientID, Satpathy_T_cell_annot) %>% summarise(y = median(tel_content), Time = first(normalized_count), responder = responder),
@@ -1434,20 +1172,14 @@ SA12 <- ggplot(subset(merged_data, pre_post == "pre treatment"), aes(patientID, 
             stat = "unique", 
             parse = TRUE
   ) +
-    theme(axis.text.x = element_text(vjust = 1, hjust=1, size = 15),  
-        axis.text.y = element_text(size = 15),
-        axis.title = element_text(size = 20),
-        strip.text.x = element_text(size = 15),
-        strip.text.y = element_text(size = 15),
-        legend.text = element_text(size = 15),
-        legend.title = element_text(size = 20))
+    theme(axis.text.x = element_text(vjust = 1, hjust=1))
 
 SB12 <- ggplot(subset(merged_data, pre_post == "post treatment"), aes(patientID, tel_content, fill = responder)) +
   geom_boxplot() +
   coord_cartesian(ylim = c(0, 10000)) +
   facet_wrap(~Satpathy_T_cell_annot) +
   labs(x = "PatientID", y = "Telomere content", fill = "Reponse") +
-  theme_Publication +
+  theme_publication +
   scale_fill_manual(labels = c("Non-responder", "Responder"), values = c("#4393C3", "#D6604D")) +
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1)) +
   geom_text(data = merged_data %>% dplyr::filter(pre_post == "post treatment") %>% group_by(patientID, Satpathy_T_cell_annot) %>% summarise(y = median(tel_content), Time = first(normalized_count), responder = responder),
@@ -1458,13 +1190,7 @@ SB12 <- ggplot(subset(merged_data, pre_post == "post treatment"), aes(patientID,
             stat = "unique", 
             parse = TRUE
   ) +
-    theme(axis.text.x = element_text(vjust = 1, hjust=1, size = 15),  
-        axis.text.y = element_text(size = 15),
-        axis.title = element_text(size = 20),
-        strip.text.x = element_text(size = 15),
-        strip.text.y = element_text(size = 15),
-        legend.text = element_text(size = 15),
-        legend.title = element_text(size = 20))
+    theme(axis.text.x = element_text(vjust = 1, hjust=1))
 
 # generate the multipanel figure 
 SFIG12 <- plot_grid(SA12, SB12, ncol = 1, labels = c("a", "b"), label_size = 25, align = "hv")
